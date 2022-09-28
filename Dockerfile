@@ -12,4 +12,3 @@ RUN mkdir /app
 COPY --from=build /home/adminroot/tn/tn_backend/build/libs/*SNAPSHOT.jar /app/spring-boot-application.jar
 RUN ls /app/
 ENTRYPOINT ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring-boot-application.jar"]
-, "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring-boot-application.jar"]

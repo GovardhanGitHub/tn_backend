@@ -1,14 +1,15 @@
-FROM gradle:4.7.0-jdk8-alpine AS build
-COPY --chown=gradle:gradle . /home/gradle/src
-WORKDIR /home/gradle/src
+# for build
+FROM gradle AS build
+COPY --chown=gradle:gradle . /home/adminroot/tn/tn_backend WORKDIR /home/adminroot/tn/tn_backend
 RUN gradle build --no-daemon
+RUN cd /home/adminroot/tn/tn_backend/build/libs/
+RUN ls
 
-FROM openjdk:8-jre-slim
-
-EXPOSE 8080
-
+# for deploy
+FROM azul/zulu-openjdk:15
+EXPOSE 8081
 RUN mkdir /app
-
-COPY --from=build /home/gradle/src/build/libs/*.jar /app/spring-boot-application.jar
-
+COPY --from=build /home/adminroot/tn/tn_backend/build/libs/*SNAPSHOT.jar /app/spring-boot-application.jar
+RUN ls /app/
 ENTRYPOINT ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring-boot-application.jar"]
+, "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring-boot-application.jar"]

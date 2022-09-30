@@ -21,7 +21,7 @@ public class ReservoirEveryDayUpdate  extends BaseEntity{
     private User user;
 
 
-    @Column(unique = true, nullable = false)
+//    @Column(unique = true, nullable = false)
     private LocalDate date;
 
     private Double fullHeight;

@@ -20,7 +20,7 @@ User {
 
     @Column
     @JsonIgnore
-    private String password;
+    private String  password;
 
     private String plainPassword;
 

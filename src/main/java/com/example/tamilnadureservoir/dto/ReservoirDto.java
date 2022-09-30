@@ -11,8 +11,8 @@ public class ReservoirDto implements Serializable {
     public String name;
     public String region;
     public List<KeyValuePairDto> keyValuePairs;
-    private Long capacity;
-    private Long fullHeight;
+    private Double capacity;
+    private Double fullHeight;
 
     @Data
     public static class KeyValuePairDto implements Serializable {

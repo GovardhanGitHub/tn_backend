@@ -50,26 +50,27 @@ public class ReservoirController {
     @GetMapping("/{id}")
     ResponseEntity findById(@PathVariable Long id) {
         Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
-        if (reservoirOptional.isPresent())
-            return ResponseEntity.ok().body(reservoirOptional.get());
-        else
-            return ResponseEntity.badRequest().body("Bad request");
+        if (reservoirOptional.isPresent()) return ResponseEntity.ok().body(reservoirOptional.get());
+        else return ResponseEntity.badRequest().body("Bad request");
     }
 
 
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/delete")
     ResponseEntity delete(@RequestBody Long id) {
-        if (id == null)
-            return ResponseEntity.badRequest().body("Bad request");
+        if (id == null) return ResponseEntity.badRequest().body("Bad request");
         else {
             Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
             if (reservoirOptional.isPresent()) {
-                reservoirRepository.delete(reservoirOptional.get());
+                Reservoir reservoir = reservoirOptional.get();
+                reservoir.setIsDeleted(Boolean.TRUE);
+                reservoirRepository.save(reservoir);
                 return ResponseEntity.ok().body("successfully deleted");
+            } else {
+                return ResponseEntity.badRequest().body("something went wrong..");
             }
         }
-        return ResponseEntity.badRequest().body("something went wrong");
+
     }
 
 

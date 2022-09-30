@@ -93,7 +93,18 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public User update(UserRequestDto dto) {
 
 
-        User nUser = userDao.getReferenceById(dto.getId());
+        User nUser = null;
+        Optional<User> optionalUser = userDao.findById(dto.getId());
+        if (optionalUser.isPresent()) {
+
+            nUser = optionalUser.get();
+            nUser.setName(dto.getName());
+            nUser.setPhone(dto.getPhone());
+            if (dto.getEmail() != null)
+                nUser.setEmail(dto.getEmail());
+
+            nUser.setPlainPassword(dto.getPassword());
+            nUser.setPassword(bcryptEncoder.encode(dto.getPassword()));
 
 
 //        Set<Role> roleSet = new HashSet<>();
@@ -105,16 +116,17 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 //        nUser.setRoles(roleSet);
 
 
-        Set<Reservoir> reservoirs = new HashSet<>();
-        dto.getReservoirs().forEach(id -> {
-            Optional<Reservoir> optionalReservoir = reservoirRepository.findById(id);
-            optionalReservoir.ifPresent(reservoirs::add);
-        });
+            Set<Reservoir> reservoirs = new HashSet<>();
+            dto.getReservoirs().forEach(id -> {
+                Optional<Reservoir> optionalReservoir = reservoirRepository.findById(id);
+                optionalReservoir.ifPresent(reservoirs::add);
+            });
 
-        nUser.setReservoirs(reservoirs);
+            nUser.setReservoirs(reservoirs);
 
 
-        return userDao.save(nUser);
+            return userDao.save(nUser);
+        } else return null;
     }
 
 

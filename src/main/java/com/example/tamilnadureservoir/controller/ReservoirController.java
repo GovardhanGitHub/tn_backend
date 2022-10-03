@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,22 +102,18 @@ public class ReservoirController {
         return reservoirOptional.map(reservoirEveryDayUpdateRepository::findByReservoir).orElse(null);
     }
 
-//    @PreAuthorize("hasAnyRole('USER','ADMIN')")
-//    @GetMapping("/getReservoirRecentUpdatedDetails/{id}")
-//    ReservoirEveryDayUpdate getReservoirRecentUpdatedDetails(@PathVariable Long id) {
-//        Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
-//        List<ReservoirEveryDayUpdate> reservoirEveryDayUpdates = reservoirOptional.map(reservoirEveryDayUpdateRepository::findByReservoir).orElse(null);
-//        ReservoirEveryDayUpdate reservoirEveryDayUpdate = new ReservoirEveryDayUpdate();
-//        reservoirEveryDayUpdates.forEach(reservoirEveryDayUpdate ->
-//        {
-//            LocalDate lt
-//                    = LocalDate.now();
-//            if (reservoirEveryDayUpdate.getCreatedOn().getDate() == lt.get)
-//        });
-//    }
 
 
-    //add operation
+
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping("/findReservoirById/{id}")
+    Reservoir findReservoirById(@PathVariable Long id) {
+        Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
+        return reservoirOptional.orElse(null);
+    }
+
+
+
 
     @PreAuthorize("hasAnyRole('USER')")
     @PostMapping("/updateEveryDayDetails")

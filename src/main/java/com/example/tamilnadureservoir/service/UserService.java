@@ -11,5 +11,7 @@ public interface UserService {
     List<User> findAll();
     User findOne(String username);
 
+    User disableReservoir(Long maintainerId);
+
     User update(UserRequestDto dto);
 }

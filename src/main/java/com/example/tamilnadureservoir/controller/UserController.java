@@ -42,12 +42,7 @@ public class UserController {
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> generateToken(@RequestBody LoginUser loginUser) throws AuthenticationException {
-        final Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginUser.getUsername(),
-                        loginUser.getPassword()
-                )
-        );
+        final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUsername(), loginUser.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         ResponseLoginDto responseLoginDto = new ResponseLoginDto();
         responseLoginDto.setToken(jwtTokenUtil.generateToken(authentication));
@@ -63,9 +58,18 @@ public class UserController {
 
     @RequestMapping(value = "/updateUser", method = RequestMethod.POST)
     public User updateUser(@RequestBody UserRequestDto user) {
-        if (user.getId() != null)
-            return userService.update(user);
+        if (user.getId() != null) return userService.update(user);
         return null;
+    }
+
+
+    @GetMapping(value = "/disableReservoir/{id}")
+    public ResponseEntity<User> disableReservoir(@PathVariable Long id) {
+        if (id == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        return ResponseEntity.accepted().body(userService.disableReservoir(id));
     }
 
     @RequestMapping(value = "/findMaintainerByName", method = RequestMethod.POST)

@@ -3,6 +3,7 @@ package com.example.tamilnadureservoir.service.impl;
 import java.util.*;
 
 import com.example.tamilnadureservoir.dao.ReservoirRepository;
+import com.example.tamilnadureservoir.dao.RoleDao;
 import com.example.tamilnadureservoir.dao.UserDao;
 import com.example.tamilnadureservoir.dto.UserRequestDto;
 import com.example.tamilnadureservoir.model.Reservoir;
@@ -29,6 +30,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     @Autowired
     private ReservoirRepository reservoirRepository;
+
+    @Autowired
+    private RoleDao roleDao;
 
 
     @Autowired
@@ -88,6 +92,18 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         return userDao.save(nUser);
     }
 
+    @Override
+    public User disableReservoir(Long maintainerId) {
+        Optional<User> optionalUser = userDao.findById(maintainerId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setReservoirs(null);
+            User savedUser = userDao.save(user);
+            return savedUser;
+        }
+        return null;
+    }
+
 
     @Override
     public User update(UserRequestDto dto) {
@@ -97,32 +113,32 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         Optional<User> optionalUser = userDao.findById(dto.getId());
         if (optionalUser.isPresent()) {
 
+
             nUser = optionalUser.get();
+            nUser.setUsername(dto.getUsername());
             nUser.setName(dto.getName());
             nUser.setPhone(dto.getPhone());
-            if (dto.getEmail() != null)
-                nUser.setEmail(dto.getEmail());
-
+            nUser.setEmail(dto.getEmail());
             nUser.setPlainPassword(dto.getPassword());
             nUser.setPassword(bcryptEncoder.encode(dto.getPassword()));
 
 
-//        Set<Role> roleSet = new HashSet<>();
-//        dto.getRoles().forEach(id -> {
-//            Optional<Role> roleOptional = roleService.findRoleById(id);
-//            roleSet.add(roleOptional.get());
-//        });
-//
-//        nUser.setRoles(roleSet);
-
-
             Set<Reservoir> reservoirs = new HashSet<>();
-            dto.getReservoirs().forEach(id -> {
-                Optional<Reservoir> optionalReservoir = reservoirRepository.findById(id);
+            Optional<Long> optionalReservoirIds = dto.getReservoirs().stream().findFirst();
+            if (optionalReservoirIds.isPresent()) {
+                Optional<Reservoir> optionalReservoir = reservoirRepository.findById(optionalReservoirIds.get());
                 optionalReservoir.ifPresent(reservoirs::add);
-            });
-
+            }
             nUser.setReservoirs(reservoirs);
+
+
+            Set<Role> roles = new HashSet<>();
+            Optional<Long> optionalRoleIds = dto.getRoles().stream().findFirst();
+            if (optionalRoleIds.isPresent()) {
+                Optional<Role> optionalRole = roleDao.findById(optionalRoleIds.get());
+                optionalRole.ifPresent(roles::add);
+            }
+            nUser.setRoles(roles);
 
 
             return userDao.save(nUser);

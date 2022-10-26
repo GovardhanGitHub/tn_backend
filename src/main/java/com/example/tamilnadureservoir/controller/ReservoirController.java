@@ -15,8 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Slf4j
@@ -96,13 +98,23 @@ public class ReservoirController {
 
 
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping("/findTodayReservoirEveryDayDetails/{id}")
+    List<ReservoirEveryDayUpdate> findTodayReservoirEveryDayDetails(@PathVariable Long id) {
+        Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
+        List<ReservoirEveryDayUpdate> reservoirEveryDayUpdates = reservoirOptional.map(reservoirEveryDayUpdateRepository::findByReservoir).orElse(null);
+        return reservoirEveryDayUpdates != null ? reservoirEveryDayUpdates.stream().filter(reservoirEveryDayUpdate -> reservoirEveryDayUpdate.getCreatedOn().toLocalDateTime().toLocalDate().isEqual(LocalDate.now())).collect(Collectors.toList()) : null;
+
+
+    }
+
+
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/getReservoirEveryDayDetails/{id}")
     List<ReservoirEveryDayUpdate> getReservoirEveryDayDetails(@PathVariable Long id) {
         Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
         return reservoirOptional.map(reservoirEveryDayUpdateRepository::findByReservoir).orElse(null);
+
     }
-
-
 
 
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
@@ -111,8 +123,6 @@ public class ReservoirController {
         Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
         return reservoirOptional.orElse(null);
     }
-
-
 
 
     @PreAuthorize("hasAnyRole('USER')")

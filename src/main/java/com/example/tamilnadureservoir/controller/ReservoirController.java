@@ -10,8 +10,11 @@ import com.example.tamilnadureservoir.model.Reservoir;
 import com.example.tamilnadureservoir.model.ReservoirEveryDayUpdate;
 import com.example.tamilnadureservoir.model.ReservoirEveryDayUpdateDto;
 import com.example.tamilnadureservoir.model.User;
+import com.sun.istack.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +47,6 @@ public class ReservoirController {
     ResponseEntity<List<Reservoir>> findAllReservoirs() {
         List<Reservoir> reservoirList = reservoirRepository.findAll();
         return ResponseEntity.ok().body(reservoirList);
-
     }
 
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
@@ -103,8 +105,15 @@ public class ReservoirController {
         Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
         List<ReservoirEveryDayUpdate> reservoirEveryDayUpdates = reservoirOptional.map(reservoirEveryDayUpdateRepository::findByReservoir).orElse(null);
         return reservoirEveryDayUpdates != null ? reservoirEveryDayUpdates.stream().filter(reservoirEveryDayUpdate -> reservoirEveryDayUpdate.getCreatedOn().toLocalDateTime().toLocalDate().isEqual(LocalDate.now())).collect(Collectors.toList()) : null;
+    }
 
-
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping("/findByDateReservoirEveryDayDetails/{id}/{date}")
+    List<ReservoirEveryDayUpdate> findByDateReservoirEveryDayDetails(@PathVariable Long id, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        System.out.println("date {"+date+"} id {"+id+"}");
+        Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
+        List<ReservoirEveryDayUpdate> reservoirEveryDayUpdates = reservoirOptional.map(reservoirEveryDayUpdateRepository::findByReservoir).orElse(null);
+        return reservoirEveryDayUpdates != null ? reservoirEveryDayUpdates.stream().filter(reservoirEveryDayUpdate -> reservoirEveryDayUpdate.getCreatedOn().toLocalDateTime().toLocalDate().isEqual(date)).collect(Collectors.toList()) : null;
     }
 
 

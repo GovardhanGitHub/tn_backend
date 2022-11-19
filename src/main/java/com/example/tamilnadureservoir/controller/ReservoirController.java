@@ -13,12 +13,18 @@ import com.example.tamilnadureservoir.model.User;
 import com.sun.istack.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,6 +86,7 @@ public class ReservoirController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/addReservoir")
     ResponseEntity addReservoir(@RequestBody ReservoirDto reservoirDto) {
+//        Integer returnValue = uploadReservoirImage(reservoirDto.getImage());
         log.info("dto {}", reservoirDto);
         Reservoir reservoir = reservoirMapper.reservoirDto2Reservoir(reservoirDto);
         Reservoir savedEntity = reservoirRepository.save(reservoir);
@@ -110,7 +117,7 @@ public class ReservoirController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/findByDateReservoirEveryDayDetails/{id}/{date}")
     List<ReservoirEveryDayUpdate> findByDateReservoirEveryDayDetails(@PathVariable Long id, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        System.out.println("date {"+date+"} id {"+id+"}");
+        System.out.println("date {" + date + "} id {" + id + "}");
         Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
         List<ReservoirEveryDayUpdate> reservoirEveryDayUpdates = reservoirOptional.map(reservoirEveryDayUpdateRepository::findByReservoir).orElse(null);
         return reservoirEveryDayUpdates != null ? reservoirEveryDayUpdates.stream().filter(reservoirEveryDayUpdate -> reservoirEveryDayUpdate.getCreatedOn().toLocalDateTime().toLocalDate().isEqual(date)).collect(Collectors.toList()) : null;
@@ -122,7 +129,24 @@ public class ReservoirController {
     List<ReservoirEveryDayUpdate> getReservoirEveryDayDetails(@PathVariable Long id) {
         Optional<Reservoir> reservoirOptional = reservoirRepository.findById(id);
         return reservoirOptional.map(reservoirEveryDayUpdateRepository::findByReservoir).orElse(null);
+    }
 
+
+    List<String> files = new ArrayList<String>();
+    private final Path rootLocation = Paths.get("C:\\Users\\govardhan\\Pictures");
+    public Integer uploadReservoirImage(MultipartFile file) {
+
+        try {
+            try {
+                Files.copy(file.getInputStream(), this.rootLocation.resolve("hello.jpg"));
+            } catch (Exception e) {
+                throw new RuntimeException("FAIL TO UPLOAD A IMAGE..!");
+            }
+            files.add(file.getOriginalFilename());
+            return 1;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
 

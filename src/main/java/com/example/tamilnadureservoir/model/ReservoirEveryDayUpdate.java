@@ -3,12 +3,14 @@ package com.example.tamilnadureservoir.model;
 
 import com.sun.istack.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import java.time.LocalDate;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 public class ReservoirEveryDayUpdate  extends BaseEntity{

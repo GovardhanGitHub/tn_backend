@@ -1,15 +1,25 @@
 package com.example.tamilnadureservoir.dto;
 
-import lombok.Data;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ReservoirDto implements Serializable {
 //    public MultipartFile image;
+
     public Long id;
+
+    public Long imageId;
+
+
+
     public String name;
     public String region;
     public List<KeyValuePairDto> keyValuePairs;

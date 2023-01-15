@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @Where(clause="is_deleted=0")
@@ -25,9 +26,8 @@ public class Reservoir extends BaseEntity {
     private Double capacity;
     private Double fullHeight;
 
-
-//    @OneToMany(cascade=CascadeType.ALL)
-//    private List<KeyValuePair> keyValuePairs;
+    @OneToOne(cascade = CascadeType.ALL,  orphanRemoval = true)
+    private ImageModel imageModel;
 
 
 }

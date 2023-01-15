@@ -17,9 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 
-@RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping(path = "image")
+@RestController
+@RequestMapping(path = "/image")
 public class ImageUploadController {
 
     @Autowired

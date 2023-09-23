@@ -1,21 +1,16 @@
 package com.example.tamilnadureservoir.controller;
 
 
+import com.example.tamilnadureservoir.dao.ImageRepository;
 import com.example.tamilnadureservoir.dao.ReservoirEveryDayUpdateRepository;
 import com.example.tamilnadureservoir.dao.ReservoirRepository;
 import com.example.tamilnadureservoir.dao.UserDao;
 import com.example.tamilnadureservoir.dto.ReservoirDto;
 import com.example.tamilnadureservoir.mappers.ReservoirMapper;
-import com.example.tamilnadureservoir.model.Reservoir;
-import com.example.tamilnadureservoir.model.ReservoirEveryDayUpdate;
-import com.example.tamilnadureservoir.model.ReservoirEveryDayUpdateDto;
-import com.example.tamilnadureservoir.model.User;
-import com.sun.istack.NotNull;
+import com.example.tamilnadureservoir.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +29,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/reservoir")
 public class ReservoirController {
+
+    private final ImageRepository imageRepository;
     private final ReservoirRepository reservoirRepository;
 
     private final UserDao userDao;
@@ -41,7 +38,8 @@ public class ReservoirController {
 
     private final ReservoirEveryDayUpdateRepository reservoirEveryDayUpdateRepository;
 
-    public ReservoirController(ReservoirRepository reservoirRepository, UserDao userDao, ReservoirMapper reservoirMapper, ReservoirEveryDayUpdateRepository reservoirEveryDayUpdateRepository) {
+    public ReservoirController(ImageRepository imageRepository, ReservoirRepository reservoirRepository, UserDao userDao, ReservoirMapper reservoirMapper, ReservoirEveryDayUpdateRepository reservoirEveryDayUpdateRepository) {
+        this.imageRepository = imageRepository;
         this.reservoirRepository = reservoirRepository;
         this.userDao = userDao;
         this.reservoirMapper = reservoirMapper;
@@ -85,10 +83,16 @@ public class ReservoirController {
 
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/addReservoir")
-    ResponseEntity addReservoir(@RequestBody ReservoirDto reservoirDto) {
-//        Integer returnValue = uploadReservoirImage(reservoirDto.getImage());
-        log.info("dto {}", reservoirDto);
+    ResponseEntity addReservoir(@RequestBody  ReservoirDto reservoirDto) {
+        ImageModel imageModel = null;
         Reservoir reservoir = reservoirMapper.reservoirDto2Reservoir(reservoirDto);
+
+        if (reservoirDto.imageId != null) {
+            Optional<ImageModel> imageModelOptional = imageRepository.findById(reservoirDto.getImageId());
+             imageModel = imageModelOptional.orElse(null);
+            reservoir.setImageModel(imageModel);
+        }
+
         Reservoir savedEntity = reservoirRepository.save(reservoir);
         return ResponseEntity.ok().body(savedEntity);
 

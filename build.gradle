@@ -25,6 +25,9 @@ dependencies {
 	implementation 'org.springframework.ws:spring-ws-core'
 	implementation group: 'javax.xml.ws', name: 'jaxws-api', version: '2.3.1' // Use the appropriate version
 	implementation group: 'com.sun.xml.messaging.saaj', name: 'saaj-impl', version: '1.5.2' // Use the appropriate version
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 
 
 

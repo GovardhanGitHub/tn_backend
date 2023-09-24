@@ -40,6 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/soap/**").permitAll() // Allow unrestricted access to your SOAP endpoint
+                .antMatchers("/conferences/**").permitAll() // Allow unrestricted access to your SOAP endpoint
                 .antMatchers("/users/authenticate", "/users/register").permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -48,7 +49,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
     }
-
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {

@@ -2,6 +2,7 @@ package com.example.tamilnadureservoir.controller;
 
 import java.io.StringReader;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,9 +17,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +35,7 @@ import org.xml.sax.InputSource;
 import com.example.tamilnadureservoir.dao.ConferenceDataRepository;
 import com.example.tamilnadureservoir.model.ConferenceData;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/soap")
 public class SoapController {
@@ -61,6 +67,62 @@ public class SoapController {
     public ResponseEntity<List<ConferenceData>> getAllConferenceData() {
         List<ConferenceData> conferenceDataList = conferenceDataRepository.findAll();
         return new ResponseEntity<>(conferenceDataList, HttpStatus.OK);
+    }
+
+    @PutMapping("/updateConferenceData/{id}")
+    public ResponseEntity<ConferenceData> updateConferenceData(@PathVariable Long id,
+            @RequestBody ConferenceData updatedData) {
+        // Implement the logic to update conference data by ID
+        Optional<ConferenceData> existingData = conferenceDataRepository.findById(id);
+
+        if (existingData.isPresent()) {
+            ConferenceData dataToUpdate = existingData.get();
+            // Update the fields of dataToUpdate with values from updatedData
+            // e.g., dataToUpdate.setName(updatedData.getName());
+            // ...
+
+            // Save the updated data
+            conferenceDataRepository.save(dataToUpdate);
+
+            return new ResponseEntity<>(dataToUpdate, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PatchMapping("/partialUpdateConferenceData/{id}")
+    public ResponseEntity<ConferenceData> partialUpdateConferenceData(@PathVariable Long id,
+            @RequestBody Map<String, Object> updates) {
+        // Implement the logic to partially update conference data by ID
+        Optional<ConferenceData> existingData = conferenceDataRepository.findById(id);
+
+        if (existingData.isPresent()) {
+            ConferenceData dataToUpdate = existingData.get();
+
+            // Apply updates from the request body to dataToUpdate
+            for (Map.Entry<String, Object> entry : updates.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+
+                // Update specific fields based on the key-value pairs
+                // e.g., if (key.equals("name")) dataToUpdate.setName((String) value);
+                // ...
+            }
+
+            // Save the partially updated data
+            conferenceDataRepository.save(dataToUpdate);
+
+            return new ResponseEntity<>(dataToUpdate, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/deleteConferenceData/{id}")
+    public ResponseEntity<Void> deleteConferenceData(@PathVariable Long id) {
+        // Implement the logic to delete conference data by ID
+        conferenceDataRepository.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/getConferenceDataByPhone/{phone}")
